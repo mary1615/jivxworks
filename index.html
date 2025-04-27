@@ -25,6 +25,7 @@
       will-change: transform;
       transition: transform 0.5s ease-out;
       cursor: pointer;
+      z-index: 1; /* 이미지가 다른 요소 위로 오지 않도록 기본값 설정 */
     }
     .image-container img {
       width: 150%;
@@ -41,7 +42,7 @@
       color: black;
       font-size: 4rem;
       font-weight: bold;
-      z-index: 10;
+      z-index: 1000; /* 텍스트를 가장 위로 오게 설정 */
       text-align: center;
       pointer-events: auto;
     }
@@ -70,7 +71,7 @@
       background-size: cover;
       background-position: center;
       opacity: 0.2;
-      z-index: -1;
+      z-index: 0; /* 배경이 가장 뒤로 가도록 설정 */
     }
   </style>
 </head>
@@ -84,13 +85,36 @@
 
 <script>
   const images = [
-  'images/pattern1.png', 'images/pattern2.png', 'images/pattern3.png', 'images/pattern4.png', 'images/pattern5.png',
-  'images/pattern6.png', 'images/pattern7.png', 'images/pattern8.png', 'images/pattern9.png', 'images/pattern10.png',
-  'images/pattern11.png', 'images/pattern12.png', 'images/pattern13.png', 'images/pattern14.png', 'images/pattern15.png',
-  'images/pattern16.png', 'images/pattern17.png', 'images/pattern18.png', 'images/pattern19.png', 'images/pattern20.png',
-  'images/pattern21.png', 'images/pattern22.png'
-];
+    'pattern1.png', 'pattern2.png', 'pattern3.png', 'pattern4.png', 'pattern5.png',
+    'pattern6.png', 'pattern7.png', 'pattern8.png', 'pattern9.png', 'pattern10.png',
+    'pattern11.png', 'pattern12.png', 'pattern13.png', 'pattern14.png', 'pattern15.png',
+    'pattern16.png', 'pattern17.png', 'pattern18.png', 'pattern19.png', 'pattern20.png',
+    'pattern21.png', 'pattern22.png'
+  ];
 
+  const patternText = [
+    { text: "Pattern 1 Description", color: "#FF5733" },
+    { text: "Pattern 2 Description", color: "#33FF57" },
+    { text: "Pattern 3 Description", color: "#3357FF" },
+    { text: "Pattern 4 Description", color: "#F1C40F" },
+    { text: "Pattern 5 Description", color: "#9B59B6" },
+    { text: "Pattern 6 Description", color: "#FF6347" },
+    { text: "Pattern 7 Description", color: "#00FF7F" },
+    { text: "Pattern 8 Description", color: "#8E44AD" },
+    { text: "Pattern 9 Description", color: "#3498DB" },
+    { text: "Pattern 10 Description", color: "#E74C3C" },
+    { text: "Pattern 11 Description", color: "#2ECC71" },
+    { text: "Pattern 12 Description", color: "#1ABC9C" },
+    { text: "Pattern 13 Description", color: "#F39C12" },
+    { text: "Pattern 14 Description", color: "#D35400" },
+    { text: "Pattern 15 Description", color: "#7F8C8D" },
+    { text: "Pattern 16 Description", color: "#16A085" },
+    { text: "Pattern 17 Description", color: "#9B59B6" },
+    { text: "Pattern 18 Description", color: "#2980B9" },
+    { text: "Pattern 19 Description", color: "#27AE60" },
+    { text: "Pattern 20 Description", color: "#8E44AD" },
+    { text: "Pattern 21 Description", color: "#F39C12" },
+    { text: "Pattern 22 Description", color: "#2C3E50" }
   ];
 
   let shuffledImages = images.sort(() => Math.random() - 0.5);
@@ -143,14 +167,23 @@
       imgContainer.addEventListener('click', () => {
         const clickedPattern = img.src;
 
-        // Update all images to the clicked pattern
+        // 텍스트와 색상 변경
+        const patternIndex = shuffledImages.indexOf(clickedPattern);
+        const selectedText = patternText[patternIndex];
+
+        // 텍스트와 색상 업데이트
+        const centerText = document.querySelector('.center-text');
+        centerText.textContent = selectedText.text;
+        centerText.style.color = selectedText.color;
+
+        // 다른 이미지들을 클릭한 패턴으로 업데이트
         const allImages = document.querySelectorAll('.image-container img');
         allImages.forEach(img => {
           img.src = clickedPattern;
           img.style.opacity = 0;
         });
 
-        // Set the background pattern instantly
+        // 배경 패턴 설정
         if (!backgroundPattern) {
           backgroundPattern = document.createElement('div');
           backgroundPattern.className = 'background-pattern';
@@ -160,7 +193,7 @@
         backgroundPattern.style.backgroundImage = `url(${clickedPattern})`;
         backgroundPattern.style.opacity = 0.4;
 
-        currentPattern = clickedPattern; // Store the selected pattern for tracking mouse movement
+        currentPattern = clickedPattern; // 현재 선택된 패턴 저장
       });
 
       imgContainer.appendChild(img);
