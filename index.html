@@ -54,10 +54,13 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 100%;
-      height: 100%;
-      background-color: rgba(255, 255, 255, 0.7); /* 네모 박스 */
+      width: auto;
+      height: auto;
+      padding: 0.2em 0.5em;
+      background-color: transparent; /* 기본 투명 배경 */
       z-index: 5;
+      text-align: center;
+      display: inline-block;
     }
     .sub-text {
       position: absolute;
@@ -109,7 +112,7 @@
     <a href="https://www.instagram.com/jivxworks/" target="_blank">jivxworks</a>
   </div>
 
-  <div class="center-text-box"></div> <!-- jivxworks 위에 직사각형 박스 추가 -->
+  <div class="center-text-box" id="center-text-box"></div> <!-- jivxworks 위에 직사각형 박스 추가 -->
 
 <script>
   const images = [
@@ -142,6 +145,38 @@
   let backgroundPattern = null;
   let currentPattern = null;
 
+  // Get dominant color from image
+  function getDominantColor(imageSrc) {
+    const img = new Image();
+    img.src = imageSrc;
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0, img.width, img.height);
+      const pixelData = ctx.getImageData(0, 0, img.width, img.height).data;
+      let r = 0, g = 0, b = 0, count = 0;
+      for (let i = 0; i < pixelData.length; i += 4) {
+        r += pixelData[i];
+        g += pixelData[i + 1];
+        b += pixelData[i + 2];
+        count++;
+      }
+      r = Math.floor(r / count);
+      g = Math.floor(g / count);
+      b = Math.floor(b / count);
+      const dominantColor = `rgb(${r},${g},${b})`;
+      updateTextBoxColor(dominantColor);
+    };
+  }
+
+  // Update the center text box color
+  function updateTextBoxColor(color) {
+    const box = document.getElementById('center-text-box');
+    box.style.backgroundColor = color;
+  }
+
   // Image containers
   function initializeImages() {
     // Remove old images before adding new ones
@@ -158,6 +193,9 @@
 
       img.onload = () => {
         img.style.opacity = 1;
+        if (i === 0) {  // Extract dominant color from the first pattern
+          getDominantColor(shuffledImages[i].src);
+        }
       };
 
       const size = Math.random() * 100 + 50;
@@ -166,65 +204,6 @@
 
       imgContainer.style.left = `${Math.random() * (window.innerWidth - size * 1.5)}px`;
       imgContainer.style.top = `${Math.random() * (window.innerHeight - size * 1.5)}px`;
-
-      let isMoved = false;
-
-      imgContainer.addEventListener('mouseout', () => {
-        if (!isMoved) {
-          const moveX = (Math.random() - 0.5) * 300;
-          const moveY = (Math.random() - 0.5) * 300;
-          imgContainer.style.transition = 'transform 1s cubic-bezier(0.68, -0.55, 0.27, 1.55)';
-          imgContainer.style.transform = `translate(${moveX}px, ${moveY}px) scale(${Math.random() * 1.5 + 0.75})`;
-          img.style.transform = `scale(${Math.random() * 1.5 + 0.75})`;
-          isMoved = true;
-        }
-      });
-
-      imgContainer.addEventListener('transitionend', () => {
-        isMoved = false;
-      });
-
-      imgContainer.addEventListener('click', () => {
-        const clickedPattern = img.src;
-        const descriptionText = shuffledImages[i].description;
-
-        // Update all images to the clicked pattern
-        const allImages = document.querySelectorAll('.image-container img');
-        allImages.forEach(img => {
-          img.src = clickedPattern;
-          img.style.opacity = 0;
-        });
-
-        // Set the background pattern instantly
-        if (!backgroundPattern) {
-          backgroundPattern = document.createElement('div');
-          backgroundPattern.className = 'background-pattern';
-          body.appendChild(backgroundPattern);
-        }
-        backgroundPattern.style.transition = 'opacity 0.3s ease-out';
-        backgroundPattern.style.backgroundImage = `url(${clickedPattern})`;
-        backgroundPattern.style.opacity = 0.4;
-
-        currentPattern = clickedPattern; // Store the selected pattern for tracking mouse movement
-
-        // Show the description box
-        const infoBox = document.createElement('div');
-        infoBox.className = 'info-box';
-        infoBox.innerText = descriptionText;
-        body.appendChild(infoBox);
-
-        setTimeout(() => {
-          infoBox.style.opacity = 1;
-        }, 50);
-
-        // Hide description after a delay
-        setTimeout(() => {
-          infoBox.style.opacity = 0;
-          setTimeout(() => {
-            infoBox.remove();
-          }, 500);
-        }, 2000); // Keep it visible for 2 seconds
-      });
 
       imgContainer.appendChild(img);
       body.appendChild(imgContainer);
@@ -246,42 +225,6 @@
       }
     }
   });
-
-  // Track mouse movement and create new images
-  body.addEventListener('mousemove', (e) => {
-    if (currentPattern) {
-      const newImageContainer = document.createElement('div');
-      newImageContainer.className = 'image-container';
-      
-      const newImage = document.createElement('img');
-      newImage.src = currentPattern;
-      newImage.alt = 'Pattern';
-      newImage.style.width = '50px';
-      newImage.style.height = '50px';
-
-      // Position the new image near the mouse cursor
-      newImageContainer.style.left = `${e.pageX - 25}px`;
-      newImageContainer.style.top = `${e.pageY - 25}px`;
-
-      body.appendChild(newImageContainer);
-
-      // Fade in and out the new image to give it a "pop" effect
-      newImage.style.transition = 'opacity 0.5s ease-out';
-      newImage.style.opacity = 0;
-
-      setTimeout(() => {
-        newImage.style.opacity = 1;
-      }, 50);
-
-      setTimeout(() => {
-        newImage.style.opacity = 0;
-        setTimeout(() => {
-          newImageContainer.remove();
-        }, 500); // Remove the image after it fades out
-      }, 1500); // Keep the image for 1.5 seconds
-    }
-  });
-
 </script>
 
 </body>
