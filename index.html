@@ -115,11 +115,11 @@
       };
 
       const size = Math.random() * 100 + 50;
-      imgContainer.style.width = ${size * 1.5}px;
-      imgContainer.style.height = ${size * 1.5}px;
+      imgContainer.style.width = `${size * 1.5}px`;
+      imgContainer.style.height = `${size * 1.5}px`;
 
-      imgContainer.style.left = ${Math.random() * (window.innerWidth - size * 1.5)}px;
-      imgContainer.style.top = ${Math.random() * (window.innerHeight - size * 1.5)}px;
+      imgContainer.style.left = `${Math.random() * (window.innerWidth - size * 1.5)}px`;
+      imgContainer.style.top = `${Math.random() * (window.innerHeight - size * 1.5)}px`;
 
       let isMoved = false;
 
@@ -128,8 +128,8 @@
           const moveX = (Math.random() - 0.5) * 300;
           const moveY = (Math.random() - 0.5) * 300;
           imgContainer.style.transition = 'transform 1s cubic-bezier(0.68, -0.55, 0.27, 1.55)';
-          imgContainer.style.transform = translate(${moveX}px, ${moveY}px) scale(${Math.random() * 1.5 + 0.75});
-          img.style.transform = scale(${Math.random() * 1.5 + 0.75});
+          imgContainer.style.transform = `translate(${moveX}px, ${moveY}px) scale(${Math.random() * 1.5 + 0.75})`;
+          img.style.transform = `scale(${Math.random() * 1.5 + 0.75})`;
           isMoved = true;
         }
       });
@@ -155,7 +155,7 @@
           body.appendChild(backgroundPattern);
         }
         backgroundPattern.style.transition = 'opacity 0.3s ease-out';
-        backgroundPattern.style.backgroundImage = url(${clickedPattern});
+        backgroundPattern.style.backgroundImage = `url(${clickedPattern})`;
         backgroundPattern.style.opacity = 0.4;
 
         currentPattern = clickedPattern; // Store the selected pattern for tracking mouse movement
@@ -195,8 +195,8 @@
       newImage.style.height = '50px';
 
       // Position the new image near the mouse cursor
-      newImageContainer.style.left = ${e.pageX - 25}px;
-      newImageContainer.style.top = ${e.pageY - 25}px;
+      newImageContainer.style.left = `${e.pageX - 25}px`;
+      newImageContainer.style.top = `${e.pageY - 25}px`;
 
       body.appendChild(newImageContainer);
 
