@@ -11,27 +11,11 @@
       height: 100vh;
       margin: 0;
       overflow: hidden;
-      position: relative;
       display: flex;
       justify-content: center;
       align-items: center;
       font-family: 'Noto Sans Mono', monospace;
       perspective: 1000px;
-    }
-    .image-container {
-      position: absolute;
-      overflow: hidden;
-      border-radius: 0;
-      will-change: transform;
-      transition: transform 0.5s ease-out;
-      cursor: pointer;
-    }
-    .image-container img {
-      width: 150%;
-      height: 150%;
-      object-fit: cover;
-      transition: transform 0.5s ease-out;
-      loading: lazy;
     }
     .center-text {
       position: absolute;
@@ -54,8 +38,6 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: auto;
-      height: auto;
       padding: 0.2em 0.5em;
       background-color: transparent; /* 기본 투명 배경 */
       z-index: 5;
@@ -73,17 +55,6 @@
       z-index: 10;
       text-align: center;
       pointer-events: none;
-    }
-    .background-pattern {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-size: cover;
-      background-position: center;
-      opacity: 0.2;
-      z-index: -1;
     }
     .info-box {
       position: absolute;
@@ -142,7 +113,6 @@
 
   let shuffledImages = images.sort(() => Math.random() - 0.5);
   const body = document.body;
-  let backgroundPattern = null;
   let currentPattern = null;
 
   // Get dominant color from image
@@ -215,14 +185,9 @@
 
   // Background click event to reset everything
   body.addEventListener('click', (e) => {
-    if (e.target === body || e.target.classList.contains('background-pattern')) {
+    if (e.target === body) {
       shuffledImages = images.sort(() => Math.random() - 0.5);
       initializeImages();
-
-      if (backgroundPattern) {
-        backgroundPattern.remove();
-        backgroundPattern = null;
-      }
     }
   });
 </script>
