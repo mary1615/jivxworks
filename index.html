@@ -33,16 +33,15 @@
       color: black;
       text-decoration: none;
     }
-    .center-text-box {
+    .rectangular-box {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      padding: 0.2em 0.5em;
-      background-color: transparent; /* 기본 투명 배경 */
       z-index: 5;
-      text-align: center;
-      display: inline-block;
+      height: 50px;  /* 직사각형 높이 */
+      width: 200px;  /* 직사각형 너비 */
+      background-color: transparent;  /* 색상은 나중에 업데이트됨 */
     }
     .sub-text {
       position: absolute;
@@ -66,7 +65,8 @@
     <a href="https://www.instagram.com/jivxworks/" target="_blank">jivxworks</a>
   </div>
 
-  <div class="center-text-box" id="center-text-box"></div> <!-- jivxworks 위에 직사각형 박스 추가 -->
+  <!-- 직사각형 박스가 추가됨 -->
+  <div class="rectangular-box" id="rectangular-box"></div>
 
 <script>
   const images = [
@@ -120,13 +120,13 @@
       g = Math.floor(g / count);
       b = Math.floor(b / count);
       const dominantColor = `rgb(${r},${g},${b})`;
-      updateTextBoxColor(dominantColor);
+      updateRectangularBoxColor(dominantColor);
     };
   }
 
-  // Update the center text box color
-  function updateTextBoxColor(color) {
-    const box = document.getElementById('center-text-box');
+  // Update the rectangular box color
+  function updateRectangularBoxColor(color) {
+    const box = document.getElementById('rectangular-box');
     box.style.backgroundColor = color;
   }
 
