@@ -33,15 +33,16 @@
       color: black;
       text-decoration: none;
     }
-    .rectangular-box {
+    .center-text-box {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      padding: 0.2em 0.5em;
+      background-color: transparent; /* 기본 투명 배경 */
       z-index: 5;
-      height: 50px;  /* 직사각형 높이 */
-      width: 200px;  /* 직사각형 너비 */
-      background-color: transparent;  /* 색상은 나중에 업데이트됨 */
+      text-align: center;
+      display: inline-block;
     }
     .sub-text {
       position: absolute;
@@ -55,6 +56,23 @@
       text-align: center;
       pointer-events: none;
     }
+    .info-box {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5rem;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+      z-index: 100;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -65,8 +83,7 @@
     <a href="https://www.instagram.com/jivxworks/" target="_blank">jivxworks</a>
   </div>
 
-  <!-- 직사각형 박스가 추가됨 -->
-  <div class="rectangular-box" id="rectangular-box"></div>
+  <div class="center-text-box" id="center-text-box"></div> <!-- jivxworks 위에 직사각형 박스 추가 -->
 
 <script>
   const images = [
@@ -120,22 +137,22 @@
       g = Math.floor(g / count);
       b = Math.floor(b / count);
       const dominantColor = `rgb(${r},${g},${b})`;
-      updateRectangularBoxColor(dominantColor);
+      updateTextBoxColor(dominantColor);
     };
   }
 
-  // Update the rectangular box color
-  function updateRectangularBoxColor(color) {
-    const box = document.getElementById('rectangular-box');
+  // Update the center text box color
+  function updateTextBoxColor(color) {
+    const box = document.getElementById('center-text-box');
     box.style.backgroundColor = color;
   }
 
-  // Initialize images and update position and color
+  // Image containers
   function initializeImages() {
     // Remove old images before adding new ones
     const allImages = document.querySelectorAll('.image-container');
     allImages.forEach(imgContainer => imgContainer.remove());
-
+    
     for (let i = 0; i < 22; i++) {
       const imgContainer = document.createElement('div');
       imgContainer.className = 'image-container';
