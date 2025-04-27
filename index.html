@@ -56,23 +56,6 @@
       text-align: center;
       pointer-events: none;
     }
-    .info-box {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 1.5rem;
-      opacity: 0;
-      transition: opacity 0.3s ease-in-out;
-      z-index: 100;
-      pointer-events: none;
-    }
   </style>
 </head>
 <body>
@@ -147,12 +130,12 @@
     box.style.backgroundColor = color;
   }
 
-  // Image containers
+  // Initialize images and update position and color
   function initializeImages() {
     // Remove old images before adding new ones
     const allImages = document.querySelectorAll('.image-container');
     allImages.forEach(imgContainer => imgContainer.remove());
-    
+
     for (let i = 0; i < 22; i++) {
       const imgContainer = document.createElement('div');
       imgContainer.className = 'image-container';
