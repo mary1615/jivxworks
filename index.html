@@ -72,21 +72,6 @@
       opacity: 0.2;
       z-index: -1;
     }
-    .description-text {
-      position: absolute;
-      top: 60%;
-      left: 50%;
-      transform: translateX(-50%);
-      color: white;
-      background-color: rgba(0, 0, 0, 0.7);
-      padding: 10px 20px;
-      font-size: 1.5rem;
-      font-weight: bold;
-      text-align: center;
-      z-index: 20;
-      display: none; /* Initially hidden */
-      max-width: 80%;
-    }
   </style>
 </head>
 <body>
@@ -104,14 +89,6 @@
     'pattern11.png', 'pattern12.png', 'pattern13.png', 'pattern14.png', 'pattern15.png',
     'pattern16.png', 'pattern17.png', 'pattern18.png', 'pattern19.png', 'pattern20.png',
     'pattern21.png', 'pattern22.png'
-  ];
-
-  const descriptions = [
-    "Description for Pattern 1", "Description for Pattern 2", "Description for Pattern 3", "Description for Pattern 4", "Description for Pattern 5",
-    "Description for Pattern 6", "Description for Pattern 7", "Description for Pattern 8", "Description for Pattern 9", "Description for Pattern 10",
-    "Description for Pattern 11", "Description for Pattern 12", "Description for Pattern 13", "Description for Pattern 14", "Description for Pattern 15",
-    "Description for Pattern 16", "Description for Pattern 17", "Description for Pattern 18", "Description for Pattern 19", "Description for Pattern 20",
-    "Description for Pattern 21", "Description for Pattern 22"
   ];
 
   let shuffledImages = images.sort(() => Math.random() - 0.5);
@@ -138,11 +115,11 @@
       };
 
       const size = Math.random() * 100 + 50;
-      imgContainer.style.width = `${size * 1.5}px`;
-      imgContainer.style.height = `${size * 1.5}px`;
+      imgContainer.style.width = ${size * 1.5}px;
+      imgContainer.style.height = ${size * 1.5}px;
 
-      imgContainer.style.left = `${Math.random() * (window.innerWidth - size * 1.5)}px`;
-      imgContainer.style.top = `${Math.random() * (window.innerHeight - size * 1.5)}px`;
+      imgContainer.style.left = ${Math.random() * (window.innerWidth - size * 1.5)}px;
+      imgContainer.style.top = ${Math.random() * (window.innerHeight - size * 1.5)}px;
 
       let isMoved = false;
 
@@ -151,8 +128,8 @@
           const moveX = (Math.random() - 0.5) * 300;
           const moveY = (Math.random() - 0.5) * 300;
           imgContainer.style.transition = 'transform 1s cubic-bezier(0.68, -0.55, 0.27, 1.55)';
-          imgContainer.style.transform = `translate(${moveX}px, ${moveY}px) scale(${Math.random() * 1.5 + 0.75})`;
-          img.style.transform = `scale(${Math.random() * 1.5 + 0.75})`;
+          imgContainer.style.transform = translate(${moveX}px, ${moveY}px) scale(${Math.random() * 1.5 + 0.75});
+          img.style.transform = scale(${Math.random() * 1.5 + 0.75});
           isMoved = true;
         }
       });
@@ -178,21 +155,10 @@
           body.appendChild(backgroundPattern);
         }
         backgroundPattern.style.transition = 'opacity 0.3s ease-out';
-        backgroundPattern.style.backgroundImage = `url(${clickedPattern})`;
+        backgroundPattern.style.backgroundImage = url(${clickedPattern});
         backgroundPattern.style.opacity = 0.4;
 
         currentPattern = clickedPattern; // Store the selected pattern for tracking mouse movement
-
-        // Show description for the clicked pattern
-        const description = document.createElement('div');
-        description.className = 'description-text';
-        description.textContent = descriptions[images.indexOf(shuffledImages[i])];
-        body.appendChild(description);
-
-        // Display the description for 3 seconds and then hide
-        setTimeout(() => {
-          description.style.display = 'none';
-        }, 3000);
       });
 
       imgContainer.appendChild(img);
@@ -229,8 +195,8 @@
       newImage.style.height = '50px';
 
       // Position the new image near the mouse cursor
-      newImageContainer.style.left = `${e.pageX - 25}px`;
-      newImageContainer.style.top = `${e.pageY - 25}px`;
+      newImageContainer.style.left = ${e.pageX - 25}px;
+      newImageContainer.style.top = ${e.pageY - 25}px;
 
       body.appendChild(newImageContainer);
 
@@ -254,4 +220,4 @@
 </script>
 
 </body>
-</html>
+</html> 
