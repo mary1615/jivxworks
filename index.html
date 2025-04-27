@@ -25,6 +25,7 @@
       will-change: transform;
       transition: transform 0.5s ease-out;
       cursor: pointer;
+      z-index: 1; /* 이미지가 다른 요소 위로 오지 않도록 기본값 설정 */
     }
     .image-container img {
       width: 150%;
@@ -41,7 +42,7 @@
       color: black;
       font-size: 4rem;
       font-weight: bold;
-      z-index: 10;
+      z-index: 1000; /* 텍스트를 가장 위로 오게 설정 */
       text-align: center;
       pointer-events: auto;
     }
@@ -70,7 +71,7 @@
       background-size: cover;
       background-position: center;
       opacity: 0.2;
-      z-index: -1;
+      z-index: 0; /* 배경이 가장 뒤로 가도록 설정 */
     }
   </style>
 </head>
