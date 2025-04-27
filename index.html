@@ -72,22 +72,20 @@
       opacity: 0.2;
       z-index: -1;
     }
-    .info-box {
+    .description-text {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
+      top: 60%;
+      left: 50%;
+      transform: translateX(-50%);
       color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 10px 20px;
       font-size: 1.5rem;
-      opacity: 0;
-      transition: opacity 0.3s ease-in-out;
-      z-index: 100;
-      pointer-events: none;
+      font-weight: bold;
+      text-align: center;
+      z-index: 20;
+      display: none; /* Initially hidden */
+      max-width: 80%;
     }
   </style>
 </head>
@@ -101,28 +99,19 @@
 
 <script>
   const images = [
-    {src: 'pattern1.png', description: 'Description for Pattern 1'},
-    {src: 'pattern2.png', description: 'Description for Pattern 2'},
-    {src: 'pattern3.png', description: 'Description for Pattern 3'},
-    {src: 'pattern4.png', description: 'Description for Pattern 4'},
-    {src: 'pattern5.png', description: 'Description for Pattern 5'},
-    {src: 'pattern6.png', description: 'Description for Pattern 6'},
-    {src: 'pattern7.png', description: 'Description for Pattern 7'},
-    {src: 'pattern8.png', description: 'Description for Pattern 8'},
-    {src: 'pattern9.png', description: 'Description for Pattern 9'},
-    {src: 'pattern10.png', description: 'Description for Pattern 10'},
-    {src: 'pattern11.png', description: 'Description for Pattern 11'},
-    {src: 'pattern12.png', description: 'Description for Pattern 12'},
-    {src: 'pattern13.png', description: 'Description for Pattern 13'},
-    {src: 'pattern14.png', description: 'Description for Pattern 14'},
-    {src: 'pattern15.png', description: 'Description for Pattern 15'},
-    {src: 'pattern16.png', description: 'Description for Pattern 16'},
-    {src: 'pattern17.png', description: 'Description for Pattern 17'},
-    {src: 'pattern18.png', description: 'Description for Pattern 18'},
-    {src: 'pattern19.png', description: 'Description for Pattern 19'},
-    {src: 'pattern20.png', description: 'Description for Pattern 20'},
-    {src: 'pattern21.png', description: 'Description for Pattern 21'},
-    {src: 'pattern22.png', description: 'Description for Pattern 22'}
+    'pattern1.png', 'pattern2.png', 'pattern3.png', 'pattern4.png', 'pattern5.png',
+    'pattern6.png', 'pattern7.png', 'pattern8.png', 'pattern9.png', 'pattern10.png',
+    'pattern11.png', 'pattern12.png', 'pattern13.png', 'pattern14.png', 'pattern15.png',
+    'pattern16.png', 'pattern17.png', 'pattern18.png', 'pattern19.png', 'pattern20.png',
+    'pattern21.png', 'pattern22.png'
+  ];
+
+  const descriptions = [
+    "Description for Pattern 1", "Description for Pattern 2", "Description for Pattern 3", "Description for Pattern 4", "Description for Pattern 5",
+    "Description for Pattern 6", "Description for Pattern 7", "Description for Pattern 8", "Description for Pattern 9", "Description for Pattern 10",
+    "Description for Pattern 11", "Description for Pattern 12", "Description for Pattern 13", "Description for Pattern 14", "Description for Pattern 15",
+    "Description for Pattern 16", "Description for Pattern 17", "Description for Pattern 18", "Description for Pattern 19", "Description for Pattern 20",
+    "Description for Pattern 21", "Description for Pattern 22"
   ];
 
   let shuffledImages = images.sort(() => Math.random() - 0.5);
@@ -141,7 +130,7 @@
       imgContainer.className = 'image-container';
 
       const img = document.createElement('img');
-      img.src = shuffledImages[i].src;
+      img.src = shuffledImages[i];
       img.alt = 'Pattern';
 
       img.onload = () => {
@@ -174,7 +163,6 @@
 
       imgContainer.addEventListener('click', () => {
         const clickedPattern = img.src;
-        const descriptionText = shuffledImages[i].description;
 
         // Update all images to the clicked pattern
         const allImages = document.querySelectorAll('.image-container img');
@@ -195,23 +183,16 @@
 
         currentPattern = clickedPattern; // Store the selected pattern for tracking mouse movement
 
-        // Show the description box
-        const infoBox = document.createElement('div');
-        infoBox.className = 'info-box';
-        infoBox.innerText = descriptionText;
-        body.appendChild(infoBox);
+        // Show description for the clicked pattern
+        const description = document.createElement('div');
+        description.className = 'description-text';
+        description.textContent = descriptions[images.indexOf(shuffledImages[i])];
+        body.appendChild(description);
 
+        // Display the description for 3 seconds and then hide
         setTimeout(() => {
-          infoBox.style.opacity = 1;
-        }, 50);
-
-        // Hide description after a delay
-        setTimeout(() => {
-          infoBox.style.opacity = 0;
-          setTimeout(() => {
-            infoBox.remove();
-          }, 500);
-        }, 2000); // Keep it visible for 2 seconds
+          description.style.display = 'none';
+        }, 3000);
       });
 
       imgContainer.appendChild(img);
