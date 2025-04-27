@@ -72,6 +72,16 @@
       opacity: 0.2;
       z-index: -1;
     }
+    #overlayRect {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      height: 100px;
+      z-index: 15;
+      transition: background-color 0.3s ease-out;
+    }
   </style>
 </head>
 <body>
@@ -95,8 +105,54 @@
   const body = document.body;
   let backgroundPattern = null;
   let currentPattern = null;
+  let overlayRect = null; // 직사각형 요소 저장
 
-  // Image containers
+  // 색상 추출 함수
+  function getDominantColor(imageUrl, callback) {
+    const img = new Image();
+    img.src = imageUrl;
+    
+    img.onload = () => {
+      // Create a canvas to extract the image pixels
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0, img.width, img.height);
+      
+      // Get the image data
+      const imageData = ctx.getImageData(0, 0, img.width, img.height);
+      const data = imageData.data;
+      
+      // Find the most common color
+      const colorCount = {};
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const rgb = `${r},${g},${b}`;
+        
+        if (!colorCount[rgb]) {
+          colorCount[rgb] = 0;
+        }
+        colorCount[rgb]++;
+      }
+      
+      let dominantColor = '';
+      let maxCount = 0;
+      
+      for (let color in colorCount) {
+        if (colorCount[color] > maxCount) {
+          maxCount = colorCount[color];
+          dominantColor = color;
+        }
+      }
+      
+      callback(dominantColor); // Return the dominant color in rgb format
+    };
+  }
+
+  // 이미지 컨테이너 초기화
   function initializeImages() {
     // Remove old images before adding new ones
     const allImages = document.querySelectorAll('.image-container');
@@ -159,6 +215,26 @@
         backgroundPattern.style.opacity = 0.4;
 
         currentPattern = clickedPattern; // Store the selected pattern for tracking mouse movement
+
+        // Extract the dominant color of the clicked pattern
+        getDominantColor(clickedPattern, (dominantColor) => {
+          // Create or update the overlay rectangle with the dominant color
+          if (!overlayRect) {
+            overlayRect = document.createElement('div');
+            overlayRect.style.position = 'absolute';
+            overlayRect.style.top = '50%';
+            overlayRect.style.left = '50%';
+            overlayRect.style.transform = 'translate(-50%, -50%)';
+            overlayRect.style.width = '300px';  // Width of the rectangle
+            overlayRect.style.height = '100px'; // Height of the rectangle
+            overlayRect.style.zIndex = '15'; // Make sure it's on top
+            overlayRect.style.transition = 'background-color 0.3s ease-out';
+            body.appendChild(overlayRect);
+          }
+
+          // Set the background color of the overlay to the dominant color
+          overlayRect.style.backgroundColor = `rgb(${dominantColor})`;
+        });
       });
 
       imgContainer.appendChild(img);
@@ -178,6 +254,11 @@
       if (backgroundPattern) {
         backgroundPattern.remove();
         backgroundPattern = null;
+      }
+
+      if (overlayRect) {
+        overlayRect.remove();
+        overlayRect = null;
       }
     }
   });
@@ -201,23 +282,17 @@
       body.appendChild(newImageContainer);
 
       // Fade in and out the new image to give it a "pop" effect
-      newImage.style.transition = 'opacity 0.5s ease-out';
-      newImage.style.opacity = 0;
+      newImageContainer.style.transition = 'opacity 0.3s ease-out';
+      newImageContainer.style.opacity = 0;
+      setTimeout(() => {
+        newImageContainer.style.opacity = 1;
+      }, 100);
 
       setTimeout(() => {
-        newImage.style.opacity = 1;
-      }, 50);
-
-      setTimeout(() => {
-        newImage.style.opacity = 0;
-        setTimeout(() => {
-          newImageContainer.remove();
-        }, 500); // Remove the image after it fades out
-      }, 1500); // Keep the image for 1.5 seconds
+        newImageContainer.remove();
+      }, 1500);
     }
   });
-
 </script>
-
 </body>
 </html>
