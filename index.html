@@ -91,6 +91,31 @@
     'pattern21.png', 'pattern22.png'
   ];
 
+  const patternText = [
+    { text: "Pattern 1 Description", color: "#FF5733" },
+    { text: "Pattern 2 Description", color: "#33FF57" },
+    { text: "Pattern 3 Description", color: "#3357FF" },
+    { text: "Pattern 4 Description", color: "#F1C40F" },
+    { text: "Pattern 5 Description", color: "#9B59B6" },
+    { text: "Pattern 6 Description", color: "#FF6347" },
+    { text: "Pattern 7 Description", color: "#00FF7F" },
+    { text: "Pattern 8 Description", color: "#8E44AD" },
+    { text: "Pattern 9 Description", color: "#3498DB" },
+    { text: "Pattern 10 Description", color: "#E74C3C" },
+    { text: "Pattern 11 Description", color: "#2ECC71" },
+    { text: "Pattern 12 Description", color: "#1ABC9C" },
+    { text: "Pattern 13 Description", color: "#F39C12" },
+    { text: "Pattern 14 Description", color: "#D35400" },
+    { text: "Pattern 15 Description", color: "#7F8C8D" },
+    { text: "Pattern 16 Description", color: "#16A085" },
+    { text: "Pattern 17 Description", color: "#9B59B6" },
+    { text: "Pattern 18 Description", color: "#2980B9" },
+    { text: "Pattern 19 Description", color: "#27AE60" },
+    { text: "Pattern 20 Description", color: "#8E44AD" },
+    { text: "Pattern 21 Description", color: "#F39C12" },
+    { text: "Pattern 22 Description", color: "#2C3E50" }
+  ];
+
   let shuffledImages = images.sort(() => Math.random() - 0.5);
   const body = document.body;
   let backgroundPattern = null;
@@ -141,14 +166,23 @@
       imgContainer.addEventListener('click', () => {
         const clickedPattern = img.src;
 
-        // Update all images to the clicked pattern
+        // 텍스트와 색상 변경
+        const patternIndex = shuffledImages.indexOf(clickedPattern);
+        const selectedText = patternText[patternIndex];
+
+        // 텍스트와 색상 업데이트
+        const centerText = document.querySelector('.center-text');
+        centerText.textContent = selectedText.text;
+        centerText.style.color = selectedText.color;
+
+        // 다른 이미지들을 클릭한 패턴으로 업데이트
         const allImages = document.querySelectorAll('.image-container img');
         allImages.forEach(img => {
           img.src = clickedPattern;
           img.style.opacity = 0;
         });
 
-        // Set the background pattern instantly
+        // 배경 패턴 설정
         if (!backgroundPattern) {
           backgroundPattern = document.createElement('div');
           backgroundPattern.className = 'background-pattern';
@@ -158,7 +192,7 @@
         backgroundPattern.style.backgroundImage = `url(${clickedPattern})`;
         backgroundPattern.style.opacity = 0.4;
 
-        currentPattern = clickedPattern; // Store the selected pattern for tracking mouse movement
+        currentPattern = clickedPattern; // 현재 선택된 패턴 저장
       });
 
       imgContainer.appendChild(img);
