@@ -83,13 +83,14 @@
   </div>
 
 <script>
-  // 이미지 배열 (패턴 이미지 경로를 그대로 사용)
   const images = [
-    'images/pattern1.png', 'images/pattern2.png', 'images/pattern3.png', 'images/pattern4.png', 'images/pattern5.png',
-    'images/pattern6.png', 'images/pattern7.png', 'images/pattern8.png', 'images/pattern9.png', 'images/pattern10.png',
-    'images/pattern11.png', 'images/pattern12.png', 'images/pattern13.png', 'images/pattern14.png', 'images/pattern15.png',
-    'images/pattern16.png', 'images/pattern17.png', 'images/pattern18.png', 'images/pattern19.png', 'images/pattern20.png',
-    'images/pattern21.png', 'images/pattern22.png'
+  'images/pattern1.png', 'images/pattern2.png', 'images/pattern3.png', 'images/pattern4.png', 'images/pattern5.png',
+  'images/pattern6.png', 'images/pattern7.png', 'images/pattern8.png', 'images/pattern9.png', 'images/pattern10.png',
+  'images/pattern11.png', 'images/pattern12.png', 'images/pattern13.png', 'images/pattern14.png', 'images/pattern15.png',
+  'images/pattern16.png', 'images/pattern17.png', 'images/pattern18.png', 'images/pattern19.png', 'images/pattern20.png',
+  'images/pattern21.png', 'images/pattern22.png'
+];
+
   ];
 
   let shuffledImages = images.sort(() => Math.random() - 0.5);
@@ -97,9 +98,9 @@
   let backgroundPattern = null;
   let currentPattern = null;
 
-  // 이미지 초기화 및 랜덤 배치
+  // Image containers
   function initializeImages() {
-    // 기존 이미지 제거
+    // Remove old images before adding new ones
     const allImages = document.querySelectorAll('.image-container');
     allImages.forEach(imgContainer => imgContainer.remove());
     
@@ -115,7 +116,6 @@
         img.style.opacity = 1;
       };
 
-      // 이미지 크기 및 위치 랜덤 설정
       const size = Math.random() * 100 + 50;
       imgContainer.style.width = `${size * 1.5}px`;
       imgContainer.style.height = `${size * 1.5}px`;
@@ -143,14 +143,14 @@
       imgContainer.addEventListener('click', () => {
         const clickedPattern = img.src;
 
-        // 클릭한 패턴으로 모든 이미지를 업데이트
+        // Update all images to the clicked pattern
         const allImages = document.querySelectorAll('.image-container img');
         allImages.forEach(img => {
           img.src = clickedPattern;
           img.style.opacity = 0;
         });
 
-        // 배경 패턴 업데이트
+        // Set the background pattern instantly
         if (!backgroundPattern) {
           backgroundPattern = document.createElement('div');
           backgroundPattern.className = 'background-pattern';
@@ -160,7 +160,7 @@
         backgroundPattern.style.backgroundImage = `url(${clickedPattern})`;
         backgroundPattern.style.opacity = 0.4;
 
-        currentPattern = clickedPattern; // 클릭된 패턴 저장
+        currentPattern = clickedPattern; // Store the selected pattern for tracking mouse movement
       });
 
       imgContainer.appendChild(img);
@@ -168,10 +168,10 @@
     }
   }
 
-  // 이미지 초기화
+  // Initialize images on load
   initializeImages();
 
-  // 배경 클릭 시 모든 이미지를 새로 설정
+  // Background click event to reset everything
   body.addEventListener('click', (e) => {
     if (e.target === body || e.target.classList.contains('background-pattern')) {
       shuffledImages = images.sort(() => Math.random() - 0.5);
@@ -184,7 +184,7 @@
     }
   });
 
-  // 마우스 움직임에 따라 새로운 이미지 생성
+  // Track mouse movement and create new images
   body.addEventListener('mousemove', (e) => {
     if (currentPattern) {
       const newImageContainer = document.createElement('div');
@@ -196,13 +196,13 @@
       newImage.style.width = '50px';
       newImage.style.height = '50px';
 
-      // 마우스 위치에 이미지 추가
+      // Position the new image near the mouse cursor
       newImageContainer.style.left = `${e.pageX - 25}px`;
       newImageContainer.style.top = `${e.pageY - 25}px`;
 
       body.appendChild(newImageContainer);
 
-      // 새로운 이미지 "팝" 효과 추가
+      // Fade in and out the new image to give it a "pop" effect
       newImage.style.transition = 'opacity 0.5s ease-out';
       newImage.style.opacity = 0;
 
@@ -214,8 +214,8 @@
         newImage.style.opacity = 0;
         setTimeout(() => {
           newImageContainer.remove();
-        }, 500);
-      }, 1500);
+        }, 500); // Remove the image after it fades out
+      }, 1500); // Keep the image for 1.5 seconds
     }
   });
 
