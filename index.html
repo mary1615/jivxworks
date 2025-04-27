@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Random Pattern Gallery</title>
+  <title>Pattern Designer</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono&display=swap" rel="stylesheet">
   <style>
     body {
@@ -16,39 +16,8 @@
       justify-content: center;
       align-items: center;
       font-family: 'Noto Sans Mono', monospace;
-      perspective: 1000px;
     }
-    .image-container {
-      position: absolute;
-      overflow: hidden;
-      border-radius: 0;
-      will-change: transform;
-      transition: transform 0.5s ease-out;
-      cursor: pointer;
-    }
-    .image-container img {
-      width: 150%;
-      height: 150%;
-      object-fit: cover;
-      transition: transform 0.5s ease-out;
-      loading: lazy;
-    }
-    .center-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: black;
-      font-size: 4rem;
-      font-weight: bold;
-      z-index: 10;
-      text-align: center;
-      pointer-events: auto;
-    }
-    .center-text a {
-      color: black;
-      text-decoration: none;
-    }
+
     .sub-text {
       position: absolute;
       top: 10%;
@@ -57,242 +26,49 @@
       color: black;
       font-size: 1.2rem;
       font-weight: normal;
-      z-index: 10;
-      text-align: center;
-      pointer-events: none;
+      z-index: 2;
     }
-    .background-pattern {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-size: cover;
-      background-position: center;
-      opacity: 0.2;
-      z-index: -1;
-    }
-    #overlayRect {
+
+    .center-box {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 300px;
+      width: 350px;
       height: 100px;
-      z-index: 15;
-      transition: background-color 0.3s ease-out;
+      background-color: yellow; /* 네모 색 */
+      border-radius: 10px;
+      z-index: 1;
+    }
+
+    .center-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: black;
+      z-index: 2;
+      text-align: center;
+    }
+
+    .center-text a {
+      color: black;
+      text-decoration: none;
     }
   </style>
 </head>
+
 <body>
 
   <div class="sub-text">Pattern Designer</div>
+
+  <div class="center-box"></div>
 
   <div class="center-text">
     <a href="https://www.instagram.com/jivxworks/" target="_blank">jivxworks</a>
   </div>
 
-<script>
-  const images = [
-    'pattern1.png', 'pattern2.png', 'pattern3.png', 'pattern4.png', 'pattern5.png',
-    'pattern6.png', 'pattern7.png', 'pattern8.png', 'pattern9.png', 'pattern10.png',
-    'pattern11.png', 'pattern12.png', 'pattern13.png', 'pattern14.png', 'pattern15.png',
-    'pattern16.png', 'pattern17.png', 'pattern18.png', 'pattern19.png', 'pattern20.png',
-    'pattern21.png', 'pattern22.png'
-  ];
-
-  let shuffledImages = images.sort(() => Math.random() - 0.5);
-  const body = document.body;
-  let backgroundPattern = null;
-  let currentPattern = null;
-  let overlayRect = null; // 직사각형 요소 저장
-
-  // 색상 추출 함수
-  function getDominantColor(imageUrl, callback) {
-    const img = new Image();
-    img.src = imageUrl;
-    
-    img.onload = () => {
-      // Create a canvas to extract the image pixels
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0, img.width, img.height);
-      
-      // Get the image data
-      const imageData = ctx.getImageData(0, 0, img.width, img.height);
-      const data = imageData.data;
-      
-      // Find the most common color
-      const colorCount = {};
-      for (let i = 0; i < data.length; i += 4) {
-        const r = data[i];
-        const g = data[i + 1];
-        const b = data[i + 2];
-        const rgb = `${r},${g},${b}`;
-        
-        if (!colorCount[rgb]) {
-          colorCount[rgb] = 0;
-        }
-        colorCount[rgb]++;
-      }
-      
-      let dominantColor = '';
-      let maxCount = 0;
-      
-      for (let color in colorCount) {
-        if (colorCount[color] > maxCount) {
-          maxCount = colorCount[color];
-          dominantColor = color;
-        }
-      }
-      
-      callback(dominantColor); // Return the dominant color in rgb format
-    };
-  }
-
-  // 이미지 컨테이너 초기화
-  function initializeImages() {
-    // Remove old images before adding new ones
-    const allImages = document.querySelectorAll('.image-container');
-    allImages.forEach(imgContainer => imgContainer.remove());
-    
-    for (let i = 0; i < 22; i++) {
-      const imgContainer = document.createElement('div');
-      imgContainer.className = 'image-container';
-
-      const img = document.createElement('img');
-      img.src = shuffledImages[i];
-      img.alt = 'Pattern';
-
-      img.onload = () => {
-        img.style.opacity = 1;
-      };
-
-      const size = Math.random() * 100 + 50;
-      imgContainer.style.width = `${size * 1.5}px`;
-      imgContainer.style.height = `${size * 1.5}px`;
-
-      imgContainer.style.left = `${Math.random() * (window.innerWidth - size * 1.5)}px`;
-      imgContainer.style.top = `${Math.random() * (window.innerHeight - size * 1.5)}px`;
-
-      let isMoved = false;
-
-      imgContainer.addEventListener('mouseout', () => {
-        if (!isMoved) {
-          const moveX = (Math.random() - 0.5) * 300;
-          const moveY = (Math.random() - 0.5) * 300;
-          imgContainer.style.transition = 'transform 1s cubic-bezier(0.68, -0.55, 0.27, 1.55)';
-          imgContainer.style.transform = `translate(${moveX}px, ${moveY}px) scale(${Math.random() * 1.5 + 0.75})`;
-          img.style.transform = `scale(${Math.random() * 1.5 + 0.75})`;
-          isMoved = true;
-        }
-      });
-
-      imgContainer.addEventListener('transitionend', () => {
-        isMoved = false;
-      });
-
-      imgContainer.addEventListener('click', () => {
-        const clickedPattern = img.src;
-
-        // Update all images to the clicked pattern
-        const allImages = document.querySelectorAll('.image-container img');
-        allImages.forEach(img => {
-          img.src = clickedPattern;
-          img.style.opacity = 0;
-        });
-
-        // Set the background pattern instantly
-        if (!backgroundPattern) {
-          backgroundPattern = document.createElement('div');
-          backgroundPattern.className = 'background-pattern';
-          body.appendChild(backgroundPattern);
-        }
-        backgroundPattern.style.transition = 'opacity 0.3s ease-out';
-        backgroundPattern.style.backgroundImage = `url(${clickedPattern})`;
-        backgroundPattern.style.opacity = 0.4;
-
-        currentPattern = clickedPattern; // Store the selected pattern for tracking mouse movement
-
-        // Extract the dominant color of the clicked pattern
-        getDominantColor(clickedPattern, (dominantColor) => {
-          // Create or update the overlay rectangle with the dominant color
-          if (!overlayRect) {
-            overlayRect = document.createElement('div');
-            overlayRect.style.position = 'absolute';
-            overlayRect.style.top = '50%';
-            overlayRect.style.left = '50%';
-            overlayRect.style.transform = 'translate(-50%, -50%)';
-            overlayRect.style.width = '300px';  // Width of the rectangle
-            overlayRect.style.height = '100px'; // Height of the rectangle
-            overlayRect.style.zIndex = '15'; // Make sure it's on top
-            overlayRect.style.transition = 'background-color 0.3s ease-out';
-            body.appendChild(overlayRect);
-          }
-
-          // Set the background color of the overlay to the dominant color
-          overlayRect.style.backgroundColor = `rgb(${dominantColor})`;
-        });
-      });
-
-      imgContainer.appendChild(img);
-      body.appendChild(imgContainer);
-    }
-  }
-
-  // Initialize images on load
-  initializeImages();
-
-  // Background click event to reset everything
-  body.addEventListener('click', (e) => {
-    if (e.target === body || e.target.classList.contains('background-pattern')) {
-      shuffledImages = images.sort(() => Math.random() - 0.5);
-      initializeImages();
-
-      if (backgroundPattern) {
-        backgroundPattern.remove();
-        backgroundPattern = null;
-      }
-
-      if (overlayRect) {
-        overlayRect.remove();
-        overlayRect = null;
-      }
-    }
-  });
-
-  // Track mouse movement and create new images
-  body.addEventListener('mousemove', (e) => {
-    if (currentPattern) {
-      const newImageContainer = document.createElement('div');
-      newImageContainer.className = 'image-container';
-      
-      const newImage = document.createElement('img');
-      newImage.src = currentPattern;
-      newImage.alt = 'Pattern';
-      newImage.style.width = '50px';
-      newImage.style.height = '50px';
-
-      // Position the new image near the mouse cursor
-      newImageContainer.style.left = `${e.pageX - 25}px`;
-      newImageContainer.style.top = `${e.pageY - 25}px`;
-
-      body.appendChild(newImageContainer);
-
-      // Fade in and out the new image to give it a "pop" effect
-      newImageContainer.style.transition = 'opacity 0.3s ease-out';
-      newImageContainer.style.opacity = 0;
-      setTimeout(() => {
-        newImageContainer.style.opacity = 1;
-      }, 100);
-
-      setTimeout(() => {
-        newImageContainer.remove();
-      }, 1500);
-    }
-  });
-</script>
 </body>
 </html>
