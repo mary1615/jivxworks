@@ -21,14 +21,13 @@
     .image-container {
       position: absolute;
       overflow: hidden;
-      border-radius: 0;
       will-change: transform;
       transition: transform 0.5s ease-out;
       cursor: pointer;
     }
     .image-container img {
-      width: 150%;
-      height: 150%;
+      width: 100%;
+      height: 100%;
       object-fit: cover;
       transition: transform 0.5s ease-out;
       loading: lazy;
@@ -72,6 +71,52 @@
       opacity: 0.2;
       z-index: -1;
     }
+    .info-box {
+      position: absolute;
+      background: white;
+      color: black;
+      padding: 8px 16px;
+      border-radius: 0px;
+      font-size: 14px;
+      display: none;
+      z-index: 100;
+      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    /* 빨간색 원 아이콘 스타일 */
+.grid-icon {
+  position: absolute;
+  top: 47%; /* 화면의 중앙에 가깝게 위치 */
+  left: 95%; /* 화면의 중앙에 가깝게 위치 */
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  width: 30px;  /* 반으로 줄임 */
+  height: 30px;
+  background-color: #000000;  /* 빨간색 */
+  border-radius: 50%;  /* 원 모양 */
+  z-index: 1000;
+}
+
+/* 파란색 원 아이콘 스타일 */
+.blue-circle {
+  position: absolute;
+  top: 53%;  /* 빨간색 원 바로 아래 */
+  left: 95%;  /* 화면 중앙에 맞춰 */
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  width: 30px;  /* 반으로 줄임 */
+  height: 30px;
+  background-color: #000000;  /* 파란색 */
+  border-radius: 50%;  /* 원 모양 */
+  z-index: 1001;
+  opacity: 1;  /* 보이도록 설정 */
+}
+
+
+    /* 숨기기 스타일 */
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -81,6 +126,12 @@
   <div class="center-text">
     <a href="https://www.instagram.com/jivxworks/" target="_blank">jivxworks</a>
   </div>
+
+  <!-- 격자 무늬 아이콘 -->
+  <div class="grid-icon" id="gridIcon"></div>
+
+  <!-- 파란색 원 아이콘 -->
+  <div class="blue-circle" id="blueCircle"></div>
 
 <script>
   const images = [
@@ -95,10 +146,14 @@
   const body = document.body;
   let backgroundPattern = null;
   let currentPattern = null;
+  let isBlueCircleActive = false; // 파란 원 클릭 상태 체크
+  let isPatternGenerating = false; // 패턴 생성 상태 체크
+  let draggedPatterns = []; // 드래그된 패턴들을 추적
 
-  // Image containers
+  // 이미지 컨테이너 초기화
   function initializeImages() {
-    // Remove old images before adding new ones
+    
+    // 기존 이미지 제거
     const allImages = document.querySelectorAll('.image-container');
     allImages.forEach(imgContainer => imgContainer.remove());
     
@@ -141,14 +196,14 @@
       imgContainer.addEventListener('click', () => {
         const clickedPattern = img.src;
 
-        // Update all images to the clicked pattern
+        // 클릭한 패턴으로 모든 이미지 업데이트
         const allImages = document.querySelectorAll('.image-container img');
         allImages.forEach(img => {
           img.src = clickedPattern;
           img.style.opacity = 0;
         });
 
-        // Set the background pattern instantly
+        // 배경 패턴 설정
         if (!backgroundPattern) {
           backgroundPattern = document.createElement('div');
           backgroundPattern.className = 'background-pattern';
@@ -158,66 +213,235 @@
         backgroundPattern.style.backgroundImage = `url(${clickedPattern})`;
         backgroundPattern.style.opacity = 0.4;
 
-        currentPattern = clickedPattern; // Store the selected pattern for tracking mouse movement
+        currentPattern = clickedPattern; // 현재 선택된 패턴 저장
+
+        // 텍스트 숨기기
+        document.querySelector('.center-text').classList.add('hidden');
+        document.querySelector('.sub-text').classList.add('hidden');
       });
 
       imgContainer.appendChild(img);
       body.appendChild(imgContainer);
+
+      // 이미지 드래그 가능 설정
+      imgContainer.setAttribute('draggable', 'true');
+      
+      let offsetX = 0, offsetY = 0;
+
+      imgContainer.addEventListener('dragstart', (e) => {
+        offsetX = e.clientX - imgContainer.offsetLeft;
+        offsetY = e.clientY - imgContainer.offsetTop;
+        imgContainer.style.transition = 'none'; // 드래그 중에는 트랜지션 비활성화
+      });
+
+      imgContainer.addEventListener('drag', (e) => {
+        if (e.clientX && e.clientY) {
+          imgContainer.style.left = `${e.clientX - offsetX}px`;
+          imgContainer.style.top = `${e.clientY - offsetY}px`;
+        }
+      });
+
+      imgContainer.addEventListener('dragend', () => {
+        imgContainer.style.transition = 'transform 0.3s ease-out'; // 트랜지션 다시 활성화
+      });
+
+      body.addEventListener('dragover', (e) => {
+        e.preventDefault();
+      });
+
+      body.addEventListener('drop', (e) => {
+        e.preventDefault();
+      });
     }
   }
 
-  // Initialize images on load
-  initializeImages();
+ // 그리드 레이아웃 생성 함수
+function createGridLayout() {
+  // 기존 이미지 제거
+  const allImages = document.querySelectorAll('.image-container');
+  allImages.forEach(imgContainer => imgContainer.remove());
 
-  // Background click event to reset everything
-  body.addEventListener('click', (e) => {
+  const rows = Math.ceil(window.innerHeight / 200); // 최소 200px 높이의 행
+  const cols = Math.ceil(window.innerWidth / 200); // 최소 200px 너비의 열
+
+  // 그리드 레이아웃을 채우기 위해 무작위 크기와 이미지 사용
+  for (let i = 0; i < rows * cols; i++) {
+    const imgContainer = document.createElement('div');
+    imgContainer.className = 'image-container';
+
+    const img = document.createElement('img');
+    img.src = shuffledImages[i % shuffledImages.length];
+    img.alt = 'Pattern';
+
+    // 이미지 크기 조정
+    const scale = Math.random() * 1.5 + 0.5; // 0.5 ~ 2배 크기
+    const width = 200 * scale;
+    const height = 200 * scale;
+
+    imgContainer.style.width = `${width}px`;
+    imgContainer.style.height = `${height}px`;
+
+    // 랜덤하게 기하학적 도형 설정
+    const randomShape = getRandomShape();
+    imgContainer.style.clipPath = randomShape;
+
+    // 위치 계산
+    const offsetX = (i % cols) * width;
+    const offsetY = Math.floor(i / cols) * height;
+
+    imgContainer.style.left = `${offsetX}px`;
+    imgContainer.style.top = `${offsetY}px`;
+
+    img.onload = () => {
+      img.style.opacity = 1;
+    };
+
+    imgContainer.appendChild(img);
+    body.appendChild(imgContainer);
+  }
+
+  // 그리드 배경 채우기
+  if (!backgroundPattern) {
+    backgroundPattern = document.createElement('div');
+    backgroundPattern.className = 'background-pattern';
+    body.appendChild(backgroundPattern);
+  }
+  backgroundPattern.style.backgroundSize = 'auto'; // 이미지 크기 자동 조정
+  backgroundPattern.style.backgroundRepeat = 'repeat'; // 패턴 반복
+  backgroundPattern.style.backgroundPosition = 'center'; // 중앙 정렬
+  backgroundPattern.style.opacity = 1; // 불투명도 증가
+}
+
+// 랜덤한 기하학적 도형을 반환하는 함수
+function getRandomShape() {
+  const shapes = [
+    'polygon(0 0, 100% 0, 90% 100%, 10% 100%)', // 삐죽한 사각형
+    'polygon(50% 0%, 100% 100%, 0% 100%)',      // 불규칙 삼각형
+    'polygon(10% 0%, 90% 0%, 100% 60%, 0% 60%)', // 불규칙 직사각형
+    'circle(50% at 50% 50%)',                   // 원
+  ];
+
+  return shapes[Math.floor(Math.random() * shapes.length)];
+}
+
+// 초기 이미지 설정
+initializeImages();
+
+// 배경 클릭 시 초기화
+body.addEventListener('click', (e) => {
+  if (e.target === body || e.target.classList.contains('background-pattern')) {
+    shuffledImages = images.sort(() => Math.random() - 0.5);
+    initializeImages();
+
+    if (backgroundPattern) {
+      backgroundPattern.remove();
+      backgroundPattern = null;
+    }
+
+    // 텍스트 다시 보이게
+    document.querySelector('.center-text').classList.remove('hidden');
+    document.querySelector('.sub-text').classList.remove('hidden');
+  }
+});
+
+// 빨간색 원 클릭 시 텍스트 숨기고 랜덤 패턴 생성
+document.getElementById('gridIcon').addEventListener('click', () => {
+  createGridLayout();  // 그리드 레이아웃 함수 호출
+
+  // 텍스트 숨기기
+  document.querySelector('.center-text').classList.add('hidden');
+  document.querySelector('.sub-text').classList.add('hidden');
+});
+
+
+
+
+
+  
+// 파란색 원 클릭 시
+const blueCircle = document.getElementById('blueCircle');
+blueCircle.addEventListener('click', () => {
+  if (isBlueCircleActive) {
+    // 패턴 생성 멈추기
+    document.removeEventListener('mousemove', generatePatternOnMouseMove);
+    isPatternGenerating = false;
+    blueCircle.style.backgroundColor = '#000'; // 원 색상 초기화
+  } else {
+    // 패턴 생성 시작
+    // 기존 이미지 제거
+    const allImages = document.querySelectorAll('.image-container');
+    allImages.forEach(imgContainer => imgContainer.remove());
+    // 텍스트 숨기기
+    document.querySelector('.center-text').classList.add('hidden');
+    document.querySelector('.sub-text').classList.add('hidden');
+    document.addEventListener('mousemove', generatePatternOnMouseMove);
+    isPatternGenerating = true;
+    
+    blueCircle.style.backgroundColor = '#1e90ff'; // 원 색상 변경
+  }
+  isBlueCircleActive = !isBlueCircleActive; // 클릭 상태 반전
+});
+
+// 패턴 생성 함수
+function generatePatternOnMouseMove(e) {
+  if (!isPatternGenerating) return;
+
+  const pattern = document.createElement('img');
+  const randomPattern = shuffledImages[Math.floor(Math.random() * shuffledImages.length)];
+  pattern.src = randomPattern;
+
+  // 랜덤 크기 생성 (30px ~ 130px)
+  const size = Math.random() * 100 + 30; // 30 ~ 130 범위의 랜덤 값
+
+  pattern.style.position = 'absolute';
+  pattern.style.left = `${e.pageX - size / 2}px`;  // 크기 반영해서 중앙에 위치
+  pattern.style.top = `${e.pageY - size / 2}px`;   // 크기 반영해서 중앙에 위치
+  pattern.style.width = `${size}px`;
+  pattern.style.height = `${size}px`;
+  pattern.style.transition = 'transform 0.3s ease-out';
+
+  document.body.appendChild(pattern);
+
+
+  // 드래그 가능 설정
+  let offsetX = 0, offsetY = 0;
+
+  pattern.setAttribute('draggable', 'true');
+  pattern.addEventListener('dragstart', (e) => {
+    offsetX = e.clientX - pattern.offsetLeft;
+    offsetY = e.clientY - pattern.offsetTop;
+    pattern.style.transition = 'none'; // 드래그 중에는 트랜지션 비활성화
+  });
+
+  pattern.addEventListener('drag', (e) => {
+    if (e.clientX && e.clientY) {
+      pattern.style.left = `${e.clientX - offsetX}px`;
+      pattern.style.top = `${e.clientY - offsetY}px`;
+    }
+  });
+
+  // 드래그된 패턴을 배열에 추가
+  draggedPatterns.push(pattern);
+}
+
+// 배경 클릭 시 드래그된 패턴 삭제
+body.addEventListener('click', (e) => {
     if (e.target === body || e.target.classList.contains('background-pattern')) {
-      shuffledImages = images.sort(() => Math.random() - 0.5);
-      initializeImages();
+      // 드래그된 패턴 삭제
+      draggedPatterns.forEach(pattern => pattern.remove());
+      draggedPatterns = []; // 드래그된 패턴 리스트 초기화
 
+      // 배경 패턴 삭제
       if (backgroundPattern) {
         backgroundPattern.remove();
         backgroundPattern = null;
       }
+
+      // 텍스트 다시 보이게
+      document.querySelector('.center-text').classList.remove('hidden');
+      document.querySelector('.sub-text').classList.remove('hidden');
     }
-  });
-
-  // Track mouse movement and create new images
-  body.addEventListener('mousemove', (e) => {
-    if (currentPattern) {
-      const newImageContainer = document.createElement('div');
-      newImageContainer.className = 'image-container';
-      
-      const newImage = document.createElement('img');
-      newImage.src = currentPattern;
-      newImage.alt = 'Pattern';
-      newImage.style.width = '50px';
-      newImage.style.height = '50px';
-
-      // Position the new image near the mouse cursor
-      newImageContainer.style.left = `${e.pageX - 25}px`;
-      newImageContainer.style.top = `${e.pageY - 25}px`;
-
-      body.appendChild(newImageContainer);
-
-      // Fade in and out the new image to give it a "pop" effect
-      newImage.style.transition = 'opacity 0.5s ease-out';
-      newImage.style.opacity = 0;
-
-      setTimeout(() => {
-        newImage.style.opacity = 1;
-      }, 50);
-
-      setTimeout(() => {
-        newImage.style.opacity = 0;
-        setTimeout(() => {
-          newImageContainer.remove();
-        }, 500); // Remove the image after it fades out
-      }, 1500); // Keep the image for 1.5 seconds
-    }
-  });
-
-</script>
-
+});
+</script> 
 </body>
 </html>
