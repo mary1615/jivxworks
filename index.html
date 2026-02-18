@@ -141,9 +141,8 @@
     'pattern16.png', 'pattern17.png', 'pattern18.png', 'pattern19.png', 'pattern20.png',
     'pattern21.png', 'pattern22.png', 'pattern23.png', 'pattern24.png', 'pattern25.png', 
     'pattern26.png', 'pattern27.png', 'pattern28.png', 'pattern29.png', 'pattern30.png',
-    'pattern31.png', 'pattern32.png', 'pattern33.png', 'pattern32.png', 'pattern33.png',
-    'pattern34.png', 'pattern35.png', 'pattern36.png', 'pattern37.png', 'pattern38.png',
-    'pattern39.png', 'pattern40.png'
+    'pattern31.png', 'pattern32.png', 'pattern33.png', 'pattern34.png', 'pattern35.png',
+    'pattern36.png', 'pattern37.png', 'pattern38.png', 'pattern39.png', 'pattern40.png'
   ];
 
   let shuffledImages = images.sort(() => Math.random() - 0.5);
@@ -161,7 +160,7 @@
     const allImages = document.querySelectorAll('.image-container');
     allImages.forEach(imgContainer => imgContainer.remove());
     
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < shuffledImages.length; i++)
       const imgContainer = document.createElement('div');
       imgContainer.className = 'image-container';
 
