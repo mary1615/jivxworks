@@ -154,109 +154,102 @@
   let draggedPatterns = []; // 드래그된 패턴들을 추적
 
   // 이미지 컨테이너 초기화
-  function initializeImages() {
-    
-    // 기존 이미지 제거
-    const allImages = document.querySelectorAll('.image-container');
-    allImages.forEach(imgContainer => imgContainer.remove());
-    
-    for (let i = 0; i < 40; i++) {
-      const imgContainer = document.createElement('div');
-      imgContainer.className = 'image-container';
+ function initializeImages() {
+  // 기존 이미지 제거
+  const allImages = document.querySelectorAll('.image-container');
+  allImages.forEach(imgContainer => imgContainer.remove());
 
-      const img = document.createElement('img');
-      img.src = shuffledImages[i];
-      img.alt = 'Pattern';
+  for (let i = 0; i < Math.min(40, shuffledImages.length); i++) {
+    const imgContainer = document.createElement('div');
+    imgContainer.className = 'image-container';
 
-      img.onload = () => {
-        img.style.opacity = 1;
-      };
+    const img = document.createElement('img');
+    img.src = shuffledImages[i];
+    img.alt = 'Pattern';
+    img.loading = 'lazy';
+    img.decoding = 'async';
 
-      const size = Math.random() * 100 + 50;
-      imgContainer.style.width = `${size * 1.5}px`;
-      imgContainer.style.height = `${size * 1.5}px`;
+    img.onload = () => {
+      img.style.opacity = 1;
+    };
 
-      imgContainer.style.left = `${Math.random() * (window.innerWidth - size * 1.5)}px`;
-      imgContainer.style.top = `${Math.random() * (window.innerHeight - size * 1.5)}px`;
+    const size = Math.random() * 100 + 50;
+    imgContainer.style.width = `${size * 1.5}px`;
+    imgContainer.style.height = `${size * 1.5}px`;
 
-      let isMoved = false;
+    imgContainer.style.left = `${Math.random() * (window.innerWidth - size * 1.5)}px`;
+    imgContainer.style.top = `${Math.random() * (window.innerHeight - size * 1.5)}px`;
 
-      imgContainer.addEventListener('mouseout', () => {
-        if (!isMoved) {
-          const moveX = (Math.random() - 0.5) * 300;
-          const moveY = (Math.random() - 0.5) * 300;
-          imgContainer.style.transition = 'transform 1s cubic-bezier(0.68, -0.55, 0.27, 1.55)';
-          imgContainer.style.transform = `translate(${moveX}px, ${moveY}px) scale(${Math.random() * 1.5 + 0.75})`;
-          img.style.transform = `scale(${Math.random() * 1.5 + 0.75})`;
-          isMoved = true;
-        }
+    let isMoved = false;
+
+    imgContainer.addEventListener('mouseout', () => {
+      if (!isMoved) {
+        const moveX = (Math.random() - 0.5) * 300;
+        const moveY = (Math.random() - 0.5) * 300;
+        imgContainer.style.transition = 'transform 1s cubic-bezier(0.68, -0.55, 0.27, 1.55)';
+        imgContainer.style.transform = `translate(${moveX}px, ${moveY}px) scale(${Math.random() * 1.5 + 0.75})`;
+        img.style.transform = `scale(${Math.random() * 1.5 + 0.75})`;
+        isMoved = true;
+      }
+    });
+
+    imgContainer.addEventListener('transitionend', () => {
+      isMoved = false;
+    });
+
+    imgContainer.addEventListener('click', () => {
+      const clickedPattern = img.src;
+
+      document.querySelectorAll('.image-container img').forEach(im => {
+        im.src = clickedPattern;
+        im.style.opacity = 0;
       });
 
-      imgContainer.addEventListener('transitionend', () => {
-        isMoved = false;
-      });
+      if (!backgroundPattern) {
+        backgroundPattern = document.createElement('div');
+        backgroundPattern.className = 'background-pattern';
+        body.appendChild(backgroundPattern);
+      }
+      backgroundPattern.style.transition = 'opacity 0.3s ease-out';
+      backgroundPattern.style.backgroundImage = `url(${clickedPattern})`;
+      backgroundPattern.style.opacity = 0.4;
 
-      imgContainer.addEventListener('click', () => {
-        const clickedPattern = img.src;
+      currentPattern = clickedPattern;
 
-        // 클릭한 패턴으로 모든 이미지 업데이트
-        const allImages = document.querySelectorAll('.image-container img');
-        allImages.forEach(img => {
-          img.src = clickedPattern;
-          img.style.opacity = 0;
-        });
+      document.querySelector('.center-text').classList.add('hidden');
+      document.querySelector('.sub-text').classList.add('hidden');
+    });
 
-        // 배경 패턴 설정
-        if (!backgroundPattern) {
-          backgroundPattern = document.createElement('div');
-          backgroundPattern.className = 'background-pattern';
-          body.appendChild(backgroundPattern);
-        }
-        backgroundPattern.style.transition = 'opacity 0.3s ease-out';
-        backgroundPattern.style.backgroundImage = `url(${clickedPattern})`;
-        backgroundPattern.style.opacity = 0.4;
+    imgContainer.appendChild(img);
+    body.appendChild(imgContainer);
 
-        currentPattern = clickedPattern; // 현재 선택된 패턴 저장
+    // 드래그 가능
+    imgContainer.setAttribute('draggable', 'true');
 
-        // 텍스트 숨기기
-        document.querySelector('.center-text').classList.add('hidden');
-        document.querySelector('.sub-text').classList.add('hidden');
-      });
+    let offsetX = 0, offsetY = 0;
+    imgContainer.addEventListener('dragstart', (e) => {
+      offsetX = e.clientX - imgContainer.offsetLeft;
+      offsetY = e.clientY - imgContainer.offsetTop;
+      imgContainer.style.transition = 'none';
+    });
 
-      imgContainer.appendChild(img);
-      body.appendChild(imgContainer);
+    imgContainer.addEventListener('drag', (e) => {
+      if (e.clientX && e.clientY) {
+        imgContainer.style.left = `${e.clientX - offsetX}px`;
+        imgContainer.style.top = `${e.clientY - offsetY}px`;
+      }
+    });
 
-      // 이미지 드래그 가능 설정
-      imgContainer.setAttribute('draggable', 'true');
-      
-      let offsetX = 0, offsetY = 0;
-
-      imgContainer.addEventListener('dragstart', (e) => {
-        offsetX = e.clientX - imgContainer.offsetLeft;
-        offsetY = e.clientY - imgContainer.offsetTop;
-        imgContainer.style.transition = 'none'; // 드래그 중에는 트랜지션 비활성화
-      });
-
-      imgContainer.addEventListener('drag', (e) => {
-        if (e.clientX && e.clientY) {
-          imgContainer.style.left = `${e.clientX - offsetX}px`;
-          imgContainer.style.top = `${e.clientY - offsetY}px`;
-        }
-      });
-
-      imgContainer.addEventListener('dragend', () => {
-        imgContainer.style.transition = 'transform 0.3s ease-out'; // 트랜지션 다시 활성화
-      });
-
-      body.addEventListener('dragover', (e) => {
-        e.preventDefault();
-      });
-
-      body.addEventListener('drop', (e) => {
-        e.preventDefault();
-      });
-    }
+    imgContainer.addEventListener('dragend', () => {
+      imgContainer.style.transition = 'transform 0.3s ease-out';
+    });
   }
+}
+
+// ✅ dragover/drop 이벤트는 “for문 밖에서 한 번만” 등록해야 함
+body.addEventListener('dragover', (e) => e.preventDefault());
+body.addEventListener('drop', (e) => e.preventDefault());
+
 
  // 그리드 레이아웃 생성 함수
 function createGridLayout() {
@@ -355,9 +348,6 @@ document.getElementById('gridIcon').addEventListener('click', () => {
   document.querySelector('.center-text').classList.add('hidden');
   document.querySelector('.sub-text').classList.add('hidden');
 });
-
-
-
 
 
   
